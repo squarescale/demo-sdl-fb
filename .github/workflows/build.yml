@@ -1,0 +1,32 @@
+name: Builder
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Extract Github branch
+        id: get_branch
+        run: echo ::set-output name=GIT_BRANCH::${GITHUB_REF##*/}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/squarescale/demo-sdl-fb:latest
+          args: GIT_VERSION=${{ steps.get_branch.outputs.GIT_BRANCH }}
