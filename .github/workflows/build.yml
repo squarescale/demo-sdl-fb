@@ -28,5 +28,5 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/squarescale/demo-sdl-fb:latest
+          tags: squarescale/demo-sdl-fb:latest
           args: GIT_VERSION=${{ steps.get_branch.outputs.GIT_BRANCH }}
