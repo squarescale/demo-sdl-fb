@@ -26,7 +26,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./
-          platforms: linux/arm
+          platforms: armv7l
           file: ./Dockerfile
           push: true
           tags: squarescale/demo-sdl-fb:latest
