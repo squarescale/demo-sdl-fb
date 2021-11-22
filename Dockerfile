@@ -6,4 +6,3 @@ COPY sqsc.ppm /sqsc.ppm
 
 CMD ["sh", "-c", "while :; do fbsplash -s /sqsc.ppm ; done"]
 
-
