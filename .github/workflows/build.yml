@@ -10,11 +10,14 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
-      -
-        uses: docker/setup-buildx-action@v1
+      - name: Debug
+        run: |
+          env|sort
+          ls -al ~/.docker/cli-plugins/
+
+      - name: Set up Docker Buildx
         id: buildx
-        with:
-          install: true
+        uses: docker/setup-buildx-action@v1
 
       - name: Extract Github branch
         id: get_branch
