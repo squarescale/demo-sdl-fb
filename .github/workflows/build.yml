@@ -10,8 +10,8 @@ jobs:
 
     env:
       DOCKER_IMAGE: squarescale/demo-sdl-fb      
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  
+      DOCKER_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}  
       DOCKER_TARGET_PLATFORM: linux/arm/v7   
 
     steps:
