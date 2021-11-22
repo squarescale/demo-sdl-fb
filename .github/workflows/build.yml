@@ -6,28 +6,38 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
+
+    env:
+      DOCKER_IMAGE: squarescale/demo-sdl-fb      
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  
+      DOCKER_TARGET_PLATFORM: linux/arm/v7   
+
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+    
+      - name: Set up Docker Buildx      
+        uses: crazy-max/ghaction-docker-buildx@v1      
+        with:        
+          version: latest 
 
-      - name: Extract Github branch
-        id: get_branch
-        run: echo ::set-output name=GIT_BRANCH::${GITHUB_REF##*/}
+      - name: Prepare      
+        id: prepare
+        run: |
+          echo ::set-output name=docker_platform::${DOCKER_TARGET_PLATFORM}        
+          echo ::set-output name=docker_image::${DOCKER_IMAGE}        
+          echo ::set-output name=version::${GITHUB_RUN_NUMBER}
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Docker Login
+        run: |        
+          echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin  
 
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          context: ./
-          platforms: armv7l
-          file: ./Dockerfile
-          push: true
-          tags: squarescale/demo-sdl-fb:latest
-          args: GIT_VERSION=${{ steps.get_branch.outputs.GIT_BRANCH }}
+      - name: Run Buildx (push image)      
+        run: |
+          docker buildx build \
+          --platform ${{ steps.prepare.outputs.docker_platform }} \
+          --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }} \
+          --file ./Dockerfile \
+          --output type=image,push=true .
