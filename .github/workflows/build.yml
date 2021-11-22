@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - master
+      - dash1
+      - dash2
+      - gyro
+      - map
 
 jobs:
   build:
