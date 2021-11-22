@@ -17,7 +17,11 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
-    
+
+      - name: Extract Github branch
+        id: get_branch
+        run: echo ::set-output name=GIT_BRANCH::${GITHUB_REF##*/}
+
       - name: Set up Docker Buildx      
         uses: crazy-max/ghaction-docker-buildx@v1      
         with:        
@@ -28,7 +32,7 @@ jobs:
         run: |
           echo ::set-output name=docker_platform::${DOCKER_TARGET_PLATFORM}        
           echo ::set-output name=docker_image::${DOCKER_IMAGE}        
-          echo ::set-output name=version::${GITHUB_RUN_NUMBER}
+          echo ::set-output name=version::${{ steps.get_branch.outputs.GIT_BRANCH }}
 
       - name: Docker Login
         run: |        
