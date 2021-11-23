@@ -3,10 +3,6 @@ on:
   push:
     branches:
       - master
-      - dash1
-      - dash2
-      - gyro
-      - map
 
 jobs:
   build:
@@ -16,7 +12,11 @@ jobs:
       DOCKER_IMAGE: squarescale/demo-sdl-fb      
       DOCKER_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}  
-      DOCKER_TARGET_PLATFORM: linux/arm/v7   
+      DOCKER_TARGET_PLATFORM: linux/arm/v7  
+      SQSC_TOKEN: ${{ secrets.SQSC_TOKEN }} 
+      SQSC_ENDPOINT: https://www.sszejwach.sqsc.io
+      SQSC_PROJECT: demo-salon
+      SQSC_SERVICE: fbtest
 
     steps:
       - name: Check out code
@@ -49,3 +49,13 @@ jobs:
           --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }} \
           --file ./Dockerfile \
           --output type=image,push=true .
+
+      - name: Fetch sqsc cli
+        run: | 
+          curl -o sqsc https://s3-eu-west-1.amazonaws.com/cli-releases/sqsc-linux-amd64-latest
+          chmod +x sqsc
+
+      - name: Reschedule new image
+        run: |
+          ./sqsc login
+          ./sqsc service schedule -project-name ${SQSC_PROJECT} ${SQSC_SERVICE}
